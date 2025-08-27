@@ -7,6 +7,10 @@ let movements = [];
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     loadInitialData();
+    // Apply default filter after data loads
+    setTimeout(() => {
+        filterProducts();
+    }, 1000);
 });
 
 // API Helper functions
@@ -106,19 +110,25 @@ async function loadDashboardStats() {
 function showSection(sectionId) {
     // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
+        section.classList.add('hidden');
+        section.classList.remove('block');
     });
     
     // Remove active class from all nav items
     document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
+        item.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        item.classList.add('border-transparent', 'text-gray-500');
     });
     
     // Show selected section
-    document.getElementById(sectionId).classList.add('active');
+    const targetSection = document.getElementById(sectionId);
+    targetSection.classList.remove('hidden');
+    targetSection.classList.add('block');
     
     // Add active class to clicked nav item
-    event.target.closest('.nav-item').classList.add('active');
+    const clickedItem = event.target.closest('.nav-item');
+    clickedItem.classList.add('active', 'border-blue-500', 'text-blue-600');
+    clickedItem.classList.remove('border-transparent', 'text-gray-500');
 }
 
 // Dashboard rendering
@@ -133,24 +143,52 @@ function renderRecentMovements() {
     const recentMovements = movements.slice(0, 5);
     
     if (recentMovements.length === 0) {
-        container.innerHTML = '<p class="text-muted">No recent movements</p>';
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exchange-alt text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No recent movements</p>
+                <p class="text-sm text-gray-400 mt-1">Stock movements will appear here</p>
+            </div>
+        `;
         return;
     }
     
-    container.innerHTML = recentMovements.map(movement => `
-        <div class="movement-item">
-            <div class="movement-info">
-                <div class="movement-product">${movement.product_name} (${movement.sku})</div>
-                <div class="movement-details">
-                    ${movement.reference ? movement.reference + ' • ' : ''}
-                    ${new Date(movement.created_at).toLocaleDateString()}
-                </div>
-            </div>
-            <div class="movement-quantity ${movement.movement_type.toLowerCase()}">
-                ${movement.movement_type === 'IN' ? '+' : '-'}${movement.quantity}
-            </div>
+    container.innerHTML = `
+        <div class="space-y-3">
+            ${recentMovements.map(movement => {
+                const isStockIn = movement.movement_type === 'IN';
+                const quantityColor = isStockIn ? 'text-green-600' : 'text-red-600';
+                const quantityBg = isStockIn ? 'bg-green-50' : 'bg-red-50';
+                
+                return `
+                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <div class="flex items-center space-x-3 flex-1 min-w-0">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 ${quantityBg} rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-${isStockIn ? 'arrow-up' : 'arrow-down'} ${quantityColor} text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate">${movement.product_name}</p>
+                                <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                    <span class="bg-gray-100 px-1.5 py-0.5 rounded">${movement.sku}</span>
+                                    ${movement.reference ? `<span>• ${movement.reference}</span>` : ''}
+                                    <span>• ${new Date(movement.created_at).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 ml-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${quantityBg} ${quantityColor}">
+                                ${isStockIn ? '+' : '-'}${movement.quantity}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
         </div>
-    `).join('');
+    `;
 }
 
 // Products rendering
@@ -158,50 +196,46 @@ function renderProducts() {
     const container = document.getElementById('productsGrid');
     
     if (products.length === 0) {
-        container.innerHTML = '<p class="text-muted">No products found</p>';
+        container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500 text-lg">No products found</p></div>';
         return;
     }
     
     container.innerHTML = products.map(product => {
         const stockStatus = getStockStatus(product.stock_quantity, product.min_stock);
         const imageHtml = product.image_url 
-            ? `<img src="${product.image_url}" alt="${product.name}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`
-            : '<i class="fas fa-image"></i>';
+            ? `<img src="${product.image_url}" alt="${product.name}" class="w-full aspect-square object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-square bg-gray-100 flex items-center justify-center\\'>  <i class=\\'fas fa-image text-gray-400 text-2xl\\'></i></div>'">`
+            : '<div class="w-full aspect-square bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300"><i class="fas fa-image text-gray-400 text-2xl"></i></div>';
+        
+        const statusColors = {
+            'in-stock': 'bg-green-100 text-green-800',
+            'low-stock': 'bg-yellow-100 text-yellow-800', 
+            'out-of-stock': 'bg-red-100 text-red-800'
+        };
         
         return `
-            <div class="product-card">
-                <div class="product-image ${!product.image_url ? 'no-image' : ''}">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div class="w-full">
                     ${imageHtml}
                 </div>
-                <div class="product-header">
-                    <div>
-                        <div class="product-title">${product.name}</div>
-                        <div class="product-sku">${product.sku}</div>
+                <div class="p-3">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-medium text-gray-900 truncate">${product.name}</h3>
+                            <p class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded mt-1 inline-block">${product.sku}</p>
+                        </div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[stockStatus.class] || 'bg-gray-100 text-gray-800'} ml-2">
+                            ${stockStatus.text}
+                        </span>
                     </div>
-                    <div class="stock-status ${stockStatus.class}">${stockStatus.text}</div>
-                </div>
-                <div class="product-info">
-                    ${product.description ? `<p>${product.description}</p>` : ''}
-                    ${product.category_name ? `<p><strong>Category:</strong> ${product.category_name}</p>` : ''}
-                    ${product.supplier_name ? `<p><strong>Supplier:</strong> ${product.supplier_name}</p>` : ''}
-                </div>
-                <div class="product-stock">
-                    <div class="stock-info">
-                        <div class="label">Current Stock</div>
-                        <div class="value">${product.stock_quantity || 0}</div>
+                    
+                    <div class="bg-gray-50 rounded p-2 mb-3 text-center">
+                        <div class="text-xs text-gray-500">Current Stock</div>
+                        <div class="text-lg font-semibold text-gray-900">${product.stock_quantity || 0}</div>
                     </div>
-                    <div class="stock-info">
-                        <div class="label">Min Stock</div>
-                        <div class="value">${product.min_stock || 0}</div>
-                    </div>
-                    <div class="stock-info">
-                        <div class="label">Max Stock</div>
-                        <div class="value">${product.max_stock || 0}</div>
-                    </div>
-                </div>
-                <div class="product-actions">
-                    <button class="btn btn-sm btn-primary" onclick="quickStockAdjust(${product.id}, '${product.name}')">
-                        <i class="fas fa-edit"></i> Adjust Stock
+                    
+                    <button onclick="quickStockAdjust(${product.id}, '${product.name}')" class="w-full inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <i class="fas fa-edit mr-2"></i>
+                        Adjust Stock
                     </button>
                 </div>
             </div>
@@ -221,16 +255,41 @@ function getStockStatus(currentStock, minStock) {
 
 function filterProducts() {
     const searchTerm = document.getElementById('productSearch').value.toLowerCase();
-    const filteredProducts = products.filter(product => 
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.sku.toLowerCase().includes(searchTerm) ||
-        (product.category_name && product.category_name.toLowerCase().includes(searchTerm))
-    );
+    const availableOnly = document.getElementById('availableOnlyFilter').checked;
+    
+    let filteredProducts = products.filter(product => {
+        // Search filter
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
+            product.sku.toLowerCase().includes(searchTerm) ||
+            (product.category_name && product.category_name.toLowerCase().includes(searchTerm));
+        
+        // Available stock filter
+        const hasStock = availableOnly ? (product.stock_quantity > 0) : true;
+        
+        return matchesSearch && hasStock;
+    });
     
     const container = document.getElementById('productsGrid');
     
     if (filteredProducts.length === 0) {
-        container.innerHTML = '<p class="text-muted">No products found matching your search</p>';
+        const message = availableOnly ? 
+            'No available products found matching your search' : 
+            'No products found matching your search';
+        container.innerHTML = `
+            <div class="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-search text-gray-400 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
+                <p class="text-gray-500 max-w-sm">${message}</p>
+                ${availableOnly ? `
+                    <button onclick="document.getElementById('availableOnlyFilter').checked = false; filterProducts();" class="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-eye mr-2"></i>
+                        Show All Products
+                    </button>
+                ` : ''}
+            </div>
+        `;
         return;
     }
     
@@ -246,22 +305,40 @@ function renderStockTable() {
     const tbody = document.getElementById('stockTableBody');
     
     if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No products found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No products found</td></tr>';
         return;
     }
     
     tbody.innerHTML = products.map(product => {
         const stockStatus = getStockStatus(product.stock_quantity, product.min_stock);
+        
+        const statusColors = {
+            'in-stock': 'bg-green-100 text-green-800',
+            'low-stock': 'bg-yellow-100 text-yellow-800', 
+            'out-of-stock': 'bg-red-100 text-red-800'
+        };
+        
         return `
-            <tr>
-                <td>${product.sku}</td>
-                <td>${product.name}</td>
-                <td>${product.stock_quantity || 0}</td>
-                <td>${product.min_stock || 0}</td>
-                <td><span class="stock-status ${stockStatus.class}">${stockStatus.text}</span></td>
-                <td>
-                    <button class="btn btn-sm btn-primary" onclick="quickStockAdjust(${product.id}, '${product.name}')">
-                        <i class="fas fa-edit"></i> Adjust
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <span class="bg-gray-100 px-2 py-1 rounded text-xs">${product.sku}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div class="font-medium">${product.name}</div>
+                    ${product.category_name ? `<div class="text-xs text-gray-500">${product.category_name}</div>` : ''}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span class="font-semibold text-lg">${product.stock_quantity || 0}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[stockStatus.class] || 'bg-gray-100 text-gray-800'}">
+                        ${stockStatus.text}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="quickStockAdjust(${product.id}, '${product.name}')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <i class="fas fa-edit mr-1"></i>
+                        Adjust
                     </button>
                 </td>
             </tr>
@@ -274,25 +351,55 @@ function renderMovements() {
     const container = document.getElementById('movementsList');
     
     if (movements.length === 0) {
-        container.innerHTML = '<p class="text-muted">No stock movements found</p>';
+        container.innerHTML = `
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exchange-alt text-gray-400 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Movements Found</h3>
+                <p class="text-gray-500">Stock movements will appear here once you start adjusting inventory.</p>
+            </div>
+        `;
         return;
     }
     
-    container.innerHTML = movements.map(movement => `
-        <div class="movement-item">
-            <div class="movement-info">
-                <div class="movement-product">${movement.product_name} (${movement.sku})</div>
-                <div class="movement-details">
-                    ${movement.reference ? movement.reference + ' • ' : ''}
-                    ${movement.notes ? movement.notes + ' • ' : ''}
-                    ${new Date(movement.created_at).toLocaleString()}
+    container.innerHTML = movements.map(movement => {
+        const isStockIn = movement.movement_type === 'IN';
+        const quantityColor = isStockIn ? 'text-green-600' : 'text-red-600';
+        const quantityBg = isStockIn ? 'bg-green-50' : 'bg-red-50';
+        
+        return `
+            <div class="px-6 py-4 hover:bg-gray-50 transition-colors duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 ${quantityBg} rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-${isStockIn ? 'arrow-up' : 'arrow-down'} ${quantityColor}"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate">
+                                    ${movement.product_name}
+                                </p>
+                                <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                    <span class="bg-gray-100 px-2 py-0.5 rounded">${movement.sku}</span>
+                                    ${movement.reference ? `<span>• ${movement.reference}</span>` : ''}
+                                    <span>• ${new Date(movement.created_at).toLocaleDateString()}</span>
+                                </div>
+                                ${movement.notes ? `<p class="text-xs text-gray-600 mt-1">${movement.notes}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 ml-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${quantityBg} ${quantityColor}">
+                            ${isStockIn ? '+' : '-'}${movement.quantity}
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="movement-quantity ${movement.movement_type.toLowerCase()}">
-                ${movement.movement_type === 'IN' ? '+' : '-'}${movement.quantity}
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Categories and suppliers rendering
@@ -300,34 +407,61 @@ function renderCategories() {
     const container = document.getElementById('categoriesList');
     
     if (categories.length === 0) {
-        container.innerHTML = '<p class="text-muted">No categories found</p>';
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tags text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No categories found</p>
+                <p class="text-sm text-gray-400 mt-1">Add categories to organize your products</p>
+            </div>
+        `;
         return;
     }
     
-    container.innerHTML = categories.map(category => `
-        <div class="list-item">
-            <h4>${category.name}</h4>
-            ${category.description ? `<p>${category.description}</p>` : ''}
+    container.innerHTML = `
+        <div class="space-y-3">
+            ${categories.map(category => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                    <h4 class="text-sm font-medium text-gray-900">${category.name}</h4>
+                    ${category.description ? `<p class="text-sm text-gray-600 mt-1">${category.description}</p>` : ''}
+                </div>
+            `).join('')}
         </div>
-    `).join('');
+    `;
 }
 
 function renderSuppliers() {
     const container = document.getElementById('suppliersList');
     
     if (suppliers.length === 0) {
-        container.innerHTML = '<p class="text-muted">No suppliers found</p>';
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-truck text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No suppliers found</p>
+                <p class="text-sm text-gray-400 mt-1">Add suppliers to track product sources</p>
+            </div>
+        `;
         return;
     }
     
-    container.innerHTML = suppliers.map(supplier => `
-        <div class="list-item">
-            <h4>${supplier.name}</h4>
-            ${supplier.contact_person ? `<p><strong>Contact:</strong> ${supplier.contact_person}</p>` : ''}
-            ${supplier.email ? `<p><strong>Email:</strong> ${supplier.email}</p>` : ''}
-            ${supplier.phone ? `<p><strong>Phone:</strong> ${supplier.phone}</p>` : ''}
+    container.innerHTML = `
+        <div class="space-y-3">
+            ${suppliers.map(supplier => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                    <h4 class="text-sm font-medium text-gray-900">${supplier.name}</h4>
+                    <div class="mt-2 space-y-1">
+                        ${supplier.contact_person ? `<p class="text-xs text-gray-600"><span class="font-medium">Contact:</span> ${supplier.contact_person}</p>` : ''}
+                        ${supplier.email ? `<p class="text-xs text-gray-600"><span class="font-medium">Email:</span> ${supplier.email}</p>` : ''}
+                        ${supplier.phone ? `<p class="text-xs text-gray-600"><span class="font-medium">Phone:</span> ${supplier.phone}</p>` : ''}
+                        ${supplier.address ? `<p class="text-xs text-gray-600"><span class="font-medium">Address:</span> ${supplier.address}</p>` : ''}
+                    </div>
+                </div>
+            `).join('')}
         </div>
-    `).join('');
+    `;
 }
 
 // Populate select dropdowns

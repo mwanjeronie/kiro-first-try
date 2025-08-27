@@ -91,8 +91,13 @@ function initializeDatabase() {
       });
     } else {
       console.log('All tables created successfully');
-      // Insert sample data after all tables are created
-      insertSampleData();
+      // Insert sample data only in development
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Development mode: inserting sample data');
+        insertSampleData();
+      } else {
+        console.log('Production mode: skipping sample data insertion');
+      }
     }
   }
   

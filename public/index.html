@@ -4,165 +4,263 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    aspectRatio: {
+                        'square': '1 / 1',
+                    },
+                    colors: {
+                        border: "hsl(214.3 31.8% 91.4%)",
+                        input: "hsl(214.3 31.8% 91.4%)",
+                        ring: "hsl(222.2 84% 4.9%)",
+                        background: "hsl(0 0% 100%)",
+                        foreground: "hsl(222.2 84% 4.9%)",
+                        primary: {
+                            DEFAULT: "hsl(222.2 47.4% 11.2%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(0 84.2% 60.2%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(215.4 16.3% 46.9%)",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        card: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.5rem;
+        }
+    </style>
 </head>
-<body>
-    <div class="app">
+<body class="bg-gray-50 font-sans antialiased">
+    <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1><i class="fas fa-boxes"></i> Inventory Tracker</h1>
-                <div class="header-actions">
-                    <button class="btn btn-secondary" onclick="showBulkImportModal()">
-                        <i class="fas fa-upload"></i> Bulk Import
-                    </button>
-                    <button class="btn btn-primary" onclick="showAddProductModal()">
-                        <i class="fas fa-plus"></i> Add Product
-                    </button>
+        <header class="bg-white border-b border-gray-200 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <i class="fas fa-boxes text-blue-600 text-xl mr-3"></i>
+                        <h1 class="text-xl font-semibold text-gray-900">Inventory Tracker</h1>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="showBulkImportModal()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-upload mr-2"></i>
+                            Bulk Import
+                        </button>
+                        <button onclick="showAddProductModal()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Product
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Navigation -->
-        <nav class="nav">
-            <button class="nav-item active" onclick="showSection('dashboard')">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </button>
-            <button class="nav-item" onclick="showSection('products')">
-                <i class="fas fa-box"></i>
-                <span>Products</span>
-            </button>
-            <button class="nav-item" onclick="showSection('stock')">
-                <i class="fas fa-warehouse"></i>
-                <span>Stock</span>
-            </button>
-            <button class="nav-item" onclick="showSection('movements')">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Movements</span>
-            </button>
-            <button class="nav-item" onclick="showSection('settings')">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </button>
+        <nav class="bg-white border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-8 overflow-x-auto">
+                    <button onclick="showSection('dashboard')" class="nav-item flex flex-col items-center py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                        <i class="fas fa-tachometer-alt text-lg mb-1"></i>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </button>
+                    <button onclick="showSection('products')" class="nav-item active flex flex-col items-center py-4 px-1 border-b-2 border-blue-500 text-blue-600 whitespace-nowrap">
+                        <i class="fas fa-box text-lg mb-1"></i>
+                        <span class="text-sm font-medium">Products</span>
+                    </button>
+                    <button onclick="showSection('stock')" class="nav-item flex flex-col items-center py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                        <i class="fas fa-warehouse text-lg mb-1"></i>
+                        <span class="text-sm font-medium">Stock</span>
+                    </button>
+                    <button onclick="showSection('movements')" class="nav-item flex flex-col items-center py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                        <i class="fas fa-exchange-alt text-lg mb-1"></i>
+                        <span class="text-sm font-medium">Movements</span>
+                    </button>
+                    <button onclick="showSection('settings')" class="nav-item flex flex-col items-center py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                        <i class="fas fa-cog text-lg mb-1"></i>
+                        <span class="text-sm font-medium">Settings</span>
+                    </button>
+                </div>
+            </div>
         </nav>
 
         <!-- Main Content -->
-        <main class="main">
+        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Dashboard Section -->
-            <section id="dashboard" class="section active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="totalProducts">0</h3>
-                            <p>Total Products</p>
-                        </div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="lowStockItems">0</h3>
-                            <p>Low Stock Items</p>
+            <section id="dashboard" class="section hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-box text-blue-600 text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-2xl font-bold text-gray-900" id="totalProducts">0</h3>
+                                <p class="text-sm text-gray-500">Total Products</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card success">
-                        <div class="stat-icon">
-                            <i class="fas fa-boxes"></i>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-2xl font-bold text-gray-900" id="lowStockItems">0</h3>
+                                <p class="text-sm text-gray-500">Low Stock Items</p>
+                            </div>
                         </div>
-                        <div class="stat-content">
-                            <h3 id="totalItems">0</h3>
-                            <p>Total Items</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-boxes text-green-600 text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-2xl font-bold text-gray-900" id="totalItems">0</h3>
+                                <p class="text-sm text-gray-500">Total Items</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="dashboard-content">
-                    <div class="card">
-                        <h3>Recent Stock Movements</h3>
-                        <div id="recentMovements" class="movements-list">
-                            <!-- Recent movements will be loaded here -->
-                        </div>
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Recent Stock Movements</h3>
+                    </div>
+                    <div id="recentMovements" class="p-6">
+                        <!-- Recent movements will be loaded here -->
                     </div>
                 </div>
             </section>
 
             <!-- Products Section -->
             <section id="products" class="section">
-                <div class="section-header">
-                    <h2>Products</h2>
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Products</h2>
+                    <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="availableOnlyFilter" checked onchange="filterProducts()" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="ml-2 text-sm text-gray-700">Available Only</span>
+                        </label>
                     </div>
                 </div>
-                <div class="products-grid" id="productsGrid">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="productsGrid">
                     <!-- Products will be loaded here -->
                 </div>
             </section>
 
             <!-- Stock Section -->
-            <section id="stock" class="section">
-                <div class="section-header">
-                    <h2>Stock Management</h2>
-                    <button class="btn btn-primary" onclick="showStockAdjustModal()">
-                        <i class="fas fa-edit"></i> Adjust Stock
+            <section id="stock" class="section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Stock Management</h2>
+                    <button onclick="showStockAdjustModal()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-edit mr-2"></i>
+                        Adjust Stock
                     </button>
                 </div>
-                <div class="stock-table-container">
-                    <table class="stock-table" id="stockTable">
-                        <thead>
-                            <tr>
-                                <th>SKU</th>
-                                <th>Product</th>
-                                <th>Current Stock</th>
-                                <th>Min Stock</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockTableBody">
-                            <!-- Stock data will be loaded here -->
-                        </tbody>
-                    </table>
+                <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Stock data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- Movements Section -->
-            <section id="movements" class="section">
-                <div class="section-header">
-                    <h2>Stock Movements</h2>
+            <section id="movements" class="section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Stock Movements</h2>
                 </div>
-                <div class="movements-container">
-                    <div id="movementsList" class="movements-list">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Movement History</h3>
+                    </div>
+                    <div id="movementsList" class="divide-y divide-gray-200">
                         <!-- Movements will be loaded here -->
                     </div>
                 </div>
             </section>
 
             <!-- Settings Section -->
-            <section id="settings" class="section">
-                <div class="settings-grid">
-                    <div class="card">
-                        <h3>Categories</h3>
-                        <button class="btn btn-secondary" onclick="showAddCategoryModal()">
-                            <i class="fas fa-plus"></i> Add Category
-                        </button>
-                        <div id="categoriesList" class="list">
+            <section id="settings" class="section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Settings</h2>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900">Categories</h3>
+                            <button onclick="showAddCategoryModal()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Category
+                            </button>
+                        </div>
+                        <div id="categoriesList" class="p-6">
                             <!-- Categories will be loaded here -->
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Suppliers</h3>
-                        <button class="btn btn-secondary" onclick="showAddSupplierModal()">
-                            <i class="fas fa-plus"></i> Add Supplier
-                        </button>
-                        <div id="suppliersList" class="list">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900">Suppliers</h3>
+                            <button onclick="showAddSupplierModal()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Supplier
+                            </button>
+                        </div>
+                        <div id="suppliersList" class="p-6">
                             <!-- Suppliers will be loaded here -->
                         </div>
                     </div>
@@ -174,57 +272,62 @@
     <!-- Modals -->
     <!-- Add Product Modal -->
     <div id="addProductModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Product</h3>
-                <button class="close" onclick="closeModal('addProductModal')">&times;</button>
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Add New Product</h3>
+                <button onclick="closeModal('addProductModal')" class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition ease-in-out duration-150">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form id="addProductForm" onsubmit="addProduct(event)">
-                <div class="form-group">
-                    <label for="productSku">SKU *</label>
-                    <input type="text" id="productSku" required>
+            <form id="addProductForm" onsubmit="addProduct(event)" class="p-6 space-y-4">
+                <div>
+                    <label for="productSku" class="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+                    <input type="text" id="productSku" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="productName">Product Name *</label>
-                    <input type="text" id="productName" required>
+                <div>
+                    <label for="productName" class="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                    <input type="text" id="productName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="productDescription">Description</label>
-                    <textarea id="productDescription" rows="3"></textarea>
+                <div>
+                    <label for="productDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="productDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="productImageUrl">Image URL</label>
-                    <input type="url" id="productImageUrl" placeholder="https://example.com/image.jpg" onchange="previewProductImage()">
-                    <div id="imagePreview" class="image-preview"></div>
+                <div>
+                    <label for="productImageUrl" class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="productImageUrl" placeholder="https://example.com/image.jpg" onchange="previewProductImage()" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div id="imagePreview" class="image-preview mt-2"></div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productCategory">Category</label>
-                        <select id="productCategory">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="productCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select Category</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="productSupplier">Supplier</label>
-                        <select id="productSupplier">
+                    <div>
+                        <label for="productSupplier" class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                        <select id="productSupplier" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select Supplier</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productMinStock">Min Stock</label>
-                        <input type="number" id="productMinStock" min="0" value="0">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="productMinStock" class="block text-sm font-medium text-gray-700 mb-1">Min Stock</label>
+                        <input type="number" id="productMinStock" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div class="form-group">
-                        <label for="productMaxStock">Max Stock</label>
-                        <input type="number" id="productMaxStock" min="0" value="1000">
+                    <div>
+                        <label for="productMaxStock" class="block text-sm font-medium text-gray-700 mb-1">Max Stock</label>
+                        <input type="number" id="productMaxStock" min="0" value="1000" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Product</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal('addProductModal')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Add Product
+                    </button>
                 </div>
             </form>
         </div>
@@ -232,40 +335,46 @@
 
     <!-- Stock Adjust Modal -->
     <div id="stockAdjustModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Adjust Stock</h3>
-                <button class="close" onclick="closeModal('stockAdjustModal')">&times;</button>
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Adjust Stock</h3>
+                <button onclick="closeModal('stockAdjustModal')" class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition ease-in-out duration-150">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form id="stockAdjustForm" onsubmit="adjustStock(event)">
-                <div class="form-group">
-                    <label for="adjustProduct">Product *</label>
-                    <select id="adjustProduct" required>
+            <form id="stockAdjustForm" onsubmit="adjustStock(event)" class="p-6 space-y-4">
+                <div>
+                    <label for="adjustProduct" class="block text-sm font-medium text-gray-700 mb-1">Product *</label>
+                    <select id="adjustProduct" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select Product</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="adjustmentType">Movement Type *</label>
-                    <select id="adjustmentType" required>
+                <div>
+                    <label for="adjustmentType" class="block text-sm font-medium text-gray-700 mb-1">Movement Type *</label>
+                    <select id="adjustmentType" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <option value="IN">Stock In</option>
                         <option value="OUT">Stock Out</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="adjustQuantity">Quantity *</label>
-                    <input type="number" id="adjustQuantity" min="1" required>
+                <div>
+                    <label for="adjustQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                    <input type="number" id="adjustQuantity" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="adjustReference">Reference</label>
-                    <input type="text" id="adjustReference" placeholder="PO#, Invoice#, etc.">
+                <div>
+                    <label for="adjustReference" class="block text-sm font-medium text-gray-700 mb-1">Reference</label>
+                    <input type="text" id="adjustReference" placeholder="PO#, Invoice#, etc." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="adjustNotes">Notes</label>
-                    <textarea id="adjustNotes" rows="3" placeholder="Additional notes..."></textarea>
+                <div>
+                    <label for="adjustNotes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea id="adjustNotes" rows="3" placeholder="Additional notes..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('stockAdjustModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Adjust Stock</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal('stockAdjustModal')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Adjust Stock
+                    </button>
                 </div>
             </form>
         </div>
@@ -273,23 +382,29 @@
 
     <!-- Add Category Modal -->
     <div id="addCategoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add Category</h3>
-                <button class="close" onclick="closeModal('addCategoryModal')">&times;</button>
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Add Category</h3>
+                <button onclick="closeModal('addCategoryModal')" class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition ease-in-out duration-150">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form id="addCategoryForm" onsubmit="addCategory(event)">
-                <div class="form-group">
-                    <label for="categoryName">Category Name *</label>
-                    <input type="text" id="categoryName" required>
+            <form id="addCategoryForm" onsubmit="addCategory(event)" class="p-6 space-y-4">
+                <div>
+                    <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">Category Name *</label>
+                    <input type="text" id="categoryName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="categoryDescription">Description</label>
-                    <textarea id="categoryDescription" rows="3"></textarea>
+                <div>
+                    <label for="categoryDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="categoryDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Category</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal('addCategoryModal')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Add Category
+                    </button>
                 </div>
             </form>
         </div>
@@ -297,37 +412,43 @@
 
     <!-- Add Supplier Modal -->
     <div id="addSupplierModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add Supplier</h3>
-                <button class="close" onclick="closeModal('addSupplierModal')">&times;</button>
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Add Supplier</h3>
+                <button onclick="closeModal('addSupplierModal')" class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition ease-in-out duration-150">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form id="addSupplierForm" onsubmit="addSupplier(event)">
-                <div class="form-group">
-                    <label for="supplierName">Supplier Name *</label>
-                    <input type="text" id="supplierName" required>
+            <form id="addSupplierForm" onsubmit="addSupplier(event)" class="p-6 space-y-4">
+                <div>
+                    <label for="supplierName" class="block text-sm font-medium text-gray-700 mb-1">Supplier Name *</label>
+                    <input type="text" id="supplierName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-group">
-                    <label for="supplierContact">Contact Person</label>
-                    <input type="text" id="supplierContact">
+                <div>
+                    <label for="supplierContact" class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                    <input type="text" id="supplierContact" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="supplierEmail">Email</label>
-                        <input type="email" id="supplierEmail">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="supplierEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="supplierEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div class="form-group">
-                        <label for="supplierPhone">Phone</label>
-                        <input type="tel" id="supplierPhone">
+                    <div>
+                        <label for="supplierPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="supplierPhone" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="supplierAddress">Address</label>
-                    <textarea id="supplierAddress" rows="3"></textarea>
+                <div>
+                    <label for="supplierAddress" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <textarea id="supplierAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addSupplierModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Supplier</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal('addSupplierModal')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Add Supplier
+                    </button>
                 </div>
             </form>
         </div>
