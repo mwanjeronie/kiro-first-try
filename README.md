@@ -189,7 +189,17 @@ cp inventory.db inventory_backup_$(date +%Y%m%d).db
 
 ## License
 
-MIT License - feel free to use this project for personal or commercial purposes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### What this means:
+- ✅ Commercial use allowed
+- ✅ Modification allowed  
+- ✅ Distribution allowed
+- ✅ Private use allowed
+- ❌ No warranty provided
+- ❌ No liability assumed
+
+The MIT License is a permissive open source license that allows you to use this software for any purpose, including commercial applications, as long as you include the original copyright notice.
 
 ## Support
 
